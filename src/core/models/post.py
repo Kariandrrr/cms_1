@@ -1,26 +1,27 @@
-# from datetime import datetime
-# from typing import List
-#
-# from sqlalchemy import String, func, ForeignKey, Text
-# from sqlalchemy.orm import Mapped, relationship
-# from sqlalchemy.orm import mapped_column
-#
-# from .base import Base
-# from .mixins.created_at import CreatedAtMixin
-# from .mixins.int_id_pk import IntIdPkMixin
-#
-#
-# class Post(Base, IntIdPkMixin, CreatedAtMixin):
-#     title: Mapped[str] = mapped_column(String(200))
-#     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
-#     content: Mapped[str] = mapped_column(Text)
-#     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-#     status: Mapped[str] = mapped_column(String(20), default="draft")
-#     published_at: Mapped[datetime | None] = mapped_column(nullable=True)
-#     updated_at: Mapped[datetime] = mapped_column(
-#         server_default=func.now(), onupdate=func.now()
-#     )
-#
+from datetime import datetime
+from typing import List
+
+from sqlalchemy import String, func, ForeignKey, Text
+from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import mapped_column
+
+from .base import Base
+from .mixins.created_at import CreatedAtMixin
+from .mixins.int_id_pk import IntIdPkMixin
+
+
+class Post(Base, IntIdPkMixin, CreatedAtMixin):
+    title: Mapped[str] = mapped_column(String(200))
+    slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+    content: Mapped[str] = mapped_column(Text)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="draft")
+    published_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
+    )
+
+
 #
 # # RELATIONSHIP
 # # author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
