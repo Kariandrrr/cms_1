@@ -1,7 +1,8 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, AnyUrl
-from typing import Literal
 import logging
+from typing import Literal
+
+from pydantic import BaseModel, AnyUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
@@ -43,7 +44,7 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    url: AnyUrl
+    url: AnyUrl = "sqlite+aiosqlite:///csm.db"
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
