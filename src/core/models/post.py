@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from sqlalchemy import String, func, ForeignKey, Text
 from sqlalchemy.orm import Mapped, relationship
@@ -8,6 +8,11 @@ from sqlalchemy.orm import mapped_column
 from .base import Base
 from .mixins.created_at import CreatedAtMixin
 from .mixins.int_id_pk import IntIdPkMixin
+
+if TYPE_CHECKING:
+    from . import User
+    from . import Category
+    from . import Tag
 
 
 class Post(Base, IntIdPkMixin, CreatedAtMixin):
@@ -22,15 +27,14 @@ class Post(Base, IntIdPkMixin, CreatedAtMixin):
     )
 
 
-#
-# # RELATIONSHIP
-# # author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-# # author: Mapped["User"] = relationship(back_populates="posts")
-# # categories: Mapped[List["Category"]] = relationship(
-# #     secondary="post_category",
-# #     back_populates="posts",
-# # )
-# # tags: Mapped[List["Tag"]] = relationship(
-# #     secondary="post_tag",
-# #     back_populates="posts",
-# # )
+# RELATIONSHIP
+author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+author: Mapped["User"] = relationship(back_populates="posts")
+categories: Mapped[List["Category"]] = relationship(
+    secondary="post_category",
+    back_populates="posts",
+)
+tags: Mapped[List["Tag"]] = relationship(
+    secondary="post_tag",
+    back_populates="posts",
+)
