@@ -12,6 +12,7 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.45"}
 asyncpg = "^0.31.0"
 alembic = "~1.16.1"
 axios = "^0.4.0"
+pyjwt = {extras = ["crypto"], version = "^2.10.1"}
 
 [dependency-groups]
 dev = [
