@@ -223,3 +223,4 @@ desktop.ini
 *.sqlite3
 *.db-journal
 *.sqlite-journal
+/certs/
