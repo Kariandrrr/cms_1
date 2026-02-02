@@ -1,6 +1,7 @@
 import logging
 from typing import Literal
 
+from pathlib import Path
 from pydantic import BaseModel, AnyUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -59,6 +60,16 @@ class DatabaseConfig(BaseModel):
     }
 
 
+BASE_DIR = Path(__file__).parent.parent
+
+
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR.parent / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR.parent / "certs" / "jwt-public.pem"
+    algorithm: str = "RS256"
+    access_token_expire_minutes: int = 15
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(".env.template", ".env"),
@@ -72,7 +83,8 @@ class Settings(BaseSettings):
     gunicorn: GunicornConfig = GunicornConfig()
     logging: LoggingConfig = LoggingConfig()
     api: ApiPrefix = ApiPrefix()
-    db: DatabaseConfig
+    db: DatabaseConfig = DatabaseConfig()
+    auth_jwt: AuthJWT = AuthJWT()
 
 
 settings = Settings()
