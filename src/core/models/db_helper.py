@@ -1,5 +1,6 @@
-from typing import AsyncGenerator
 import logging
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -52,3 +53,16 @@ db_helper: DBHelper = DBHelper(
     pool_size=settings.db.pool_size,
     max_overflow=settings.db.max_overflow,
 )
+
+
+@asynccontextmanager
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    session = db_helper.session_factory()
+    try:
+        yield session
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()

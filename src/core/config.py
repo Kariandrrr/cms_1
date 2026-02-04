@@ -45,7 +45,7 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    url: AnyUrl = "sqlite+aiosqlite:///csm.db"
+    url: AnyUrl = "sqlite+aiosqlite:///app.db"
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
