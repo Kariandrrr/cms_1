@@ -1,16 +1,21 @@
+from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
+from typing import Literal
 
 
 class UserCreate(BaseModel):
     username: str
     password: str
-    role: str = "user"
+    role: Literal["admin", "editor", "user"] = "user"
 
 
+# только для ответа клиенту
 class UserOut(BaseModel):
     id: int
     username: str
     role: str
+    is_active: bool = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -18,10 +23,12 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
-class UserSchema(BaseModel):
-    model_config = ConfigDict(strict=True)
-
+# для внутреннего использования
+class UserInDB(BaseModel):
+    id: int | None = None
     username: str
-    password: bytes
+    hashed_password: bytes
     role: str
-    active: bool = True
+    is_active: bool = True
+
+    model_config = ConfigDict(from_attributes=True)
