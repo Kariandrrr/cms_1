@@ -23,4 +23,5 @@ class User(Base, IntIdPkMixin, CreatedAtMixin):
     role: Mapped[str] = mapped_column(String(20), default="user")  # admin, editor, user
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    posts: Mapped[List["Post"]] = relationship(back_populates="author")
+
+posts: Mapped[List["Post"]] = relationship(back_populates="author")
