@@ -9,9 +9,19 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from ..config import settings
+from ...core.config import settings
 
 log = logging.getLogger(__name__)
+
+
+import os
+
+DB_PATH = os.path.join(os.getcwd(), "../../../app.db")
+print(f"📁 db_helper: Подключаюсь к базе по пути: {DB_PATH}")
+print(f"📁 db_helper: Файл существует: {os.path.exists(DB_PATH)}")
+
+DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
+print(f"📁 db_helper: DATABASE_URL = {DATABASE_URL}")
 
 
 class DBHelper:
