@@ -56,7 +56,7 @@ db_helper: DBHelper = DBHelper(
 
 
 @asynccontextmanager
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
     session = db_helper.session_factory()
     try:
         yield session
@@ -66,3 +66,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         raise
     finally:
         await session.close()
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with get_db_context() as session:
+        yield session
