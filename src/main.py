@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import api_router
@@ -18,6 +18,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
+    title="CMS",
+    description="Система управления контентом (статьи, категории, пользователи, медиа)",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.include_router(api_router, prefix=settings.api.prefix)
