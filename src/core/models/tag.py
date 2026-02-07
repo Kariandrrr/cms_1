@@ -23,10 +23,10 @@ class Tag(Base, IntIdPkMixin, CreatedAtMixin):
     )
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    # RELATIONSHIP
-    posts: Mapped[List["Post"]] = relationship(
-        secondary="post_tag", back_populates="tags"
-    )
 
-    def __repr__(self) -> str:
-        return f"<Tag id={self.id} name={self.name!r} slug={self.slug}>"
+# RELATIONSHIP
+posts: Mapped[List["Post"]] = relationship(secondary="post_tag", back_populates="tags")
+
+
+def __repr__(self) -> str:
+    return f"<Tag id={self.id} name={self.name!r} slug={self.slug}>"

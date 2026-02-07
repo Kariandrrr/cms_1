@@ -1,5 +1,6 @@
-from typing import AsyncGenerator
 import logging
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -8,9 +9,19 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from ..config import settings
+from ...core.config import settings
 
 log = logging.getLogger(__name__)
+
+
+import os
+
+DB_PATH = os.path.join(os.getcwd(), "../../../app.db")
+print(f"📁 db_helper: Подключаюсь к базе по пути: {DB_PATH}")
+print(f"📁 db_helper: Файл существует: {os.path.exists(DB_PATH)}")
+
+DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
+print(f"📁 db_helper: DATABASE_URL = {DATABASE_URL}")
 
 
 class DBHelper:
@@ -52,3 +63,21 @@ db_helper: DBHelper = DBHelper(
     pool_size=settings.db.pool_size,
     max_overflow=settings.db.max_overflow,
 )
+
+
+@asynccontextmanager
+async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
+    session = db_helper.session_factory()
+    try:
+        yield session
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with get_db_context() as session:
+        yield session

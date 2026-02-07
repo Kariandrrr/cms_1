@@ -1,7 +1,8 @@
 import logging
 from typing import Literal
 
-from pydantic import BaseModel, AnyUrl
+from pathlib import Path
+from pydantic import BaseModel, AnyUrl, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOG_DEFAULT_FORMAT = (
@@ -44,7 +45,8 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    url: AnyUrl = "sqlite+aiosqlite:///csm.db"
+    file_path: str = "app.db"
+    driver: str = "sqlite+aiosqlite"
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
@@ -57,6 +59,22 @@ class DatabaseConfig(BaseModel):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
+
+    @computed_field
+    @property
+    def url(self) -> str:
+        abs_path = Path(__file__).parent.parent.parent / self.file_path
+        return f"{self.driver}:///{abs_path}"
+
+
+BASE_DIR = Path(__file__).parent.parent
+
+
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR.parent / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR.parent / "certs" / "jwt-public.pem"
+    algorithm: str = "RS256"
+    access_token_expire_minutes: int = 15
 
 
 class Settings(BaseSettings):
@@ -72,7 +90,8 @@ class Settings(BaseSettings):
     gunicorn: GunicornConfig = GunicornConfig()
     logging: LoggingConfig = LoggingConfig()
     api: ApiPrefix = ApiPrefix()
-    db: DatabaseConfig
+    db: DatabaseConfig = DatabaseConfig()
+    auth_jwt: AuthJWT = AuthJWT()
 
 
 settings = Settings()

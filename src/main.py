@@ -4,9 +4,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import api_router
-from core.config import settings
-from core.models import db_helper
+from .api import api_router
+from .core.config import settings
+from .core.models import db_helper
 
 
 @asynccontextmanager
@@ -18,6 +18,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
+    title="CMS",
+    description="Система управления контентом (статьи, категории, пользователи, медиа)",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.include_router(api_router, prefix=settings.api.prefix)
@@ -30,6 +34,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True, host=settings.run.host, port=settings.run.port)
