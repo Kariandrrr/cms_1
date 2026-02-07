@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, TYPE_CHECKING
 
 from sqlalchemy import String
@@ -9,6 +11,7 @@ from .base import Base
 from .mixins.created_at import CreatedAtMixin
 from .mixins.int_id_pk import IntIdPkMixin
 
+
 if TYPE_CHECKING:
     from . import Post
 
@@ -16,7 +19,7 @@ if TYPE_CHECKING:
 class User(Base, IntIdPkMixin, CreatedAtMixin):
     __tablename__ = "users"
     username: Mapped[str] = mapped_column(String(50), unique=True)
-    hashed_password: Mapped[str] = mapped_column(String(255))
+    hashed_password: Mapped[bytes] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(20), default="user")  # admin, editor, user
     is_active: Mapped[bool] = mapped_column(default=True)
 
