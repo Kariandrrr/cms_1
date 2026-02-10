@@ -22,14 +22,6 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-# def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
-#     jwt_payload = {
-#         "username": user.username,
-#         "password": user.password,
-#         "role": user.role,
-#     }
-#     token = auth_utils_jwt.encode_jwt(jwt_payload)
-#     return Token(access_token=token, token_type="Bearer")
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
