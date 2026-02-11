@@ -43,7 +43,7 @@ async def login(
 
     payload = {
         "sub": user.username,
-        "role": user.role,
+        "role": user.role.value,
     }
 
     token = encode_jwt(payload)

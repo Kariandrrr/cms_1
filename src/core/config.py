@@ -1,8 +1,8 @@
 import logging
+from pathlib import Path
 from typing import Literal
 
-from pathlib import Path
-from pydantic import BaseModel, AnyUrl, computed_field
+from pydantic import BaseModel, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOG_DEFAULT_FORMAT = (
@@ -45,12 +45,18 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    file_path: str = "app.db"
-    driver: str = "sqlite+aiosqlite"
-    echo: bool = False
+    driver: str = "postgresql+asyncpg"
+    echo: bool = True
     echo_pool: bool = False
-    pool_size: int = 50
+    pool_size: int = 20
     max_overflow: int = 10
+
+    # data for Postgres
+    user: str = "postgres"
+    password: str = "password"
+    host: str = "localhost"
+    port: int = 5432
+    dbname: str = "cms"
 
     naming_convention: dict[str, str] = {
         "ix": "ix_%(column_0_label)s",
@@ -63,8 +69,7 @@ class DatabaseConfig(BaseModel):
     @computed_field
     @property
     def url(self) -> str:
-        abs_path = Path(__file__).parent.parent.parent / self.file_path
-        return f"{self.driver}:///{abs_path}"
+        return f"{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
 
 
 BASE_DIR = Path(__file__).parent.parent
