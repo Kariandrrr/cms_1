@@ -14,6 +14,16 @@ from ...core.config import settings
 log = logging.getLogger(__name__)
 
 
+import os
+
+DB_PATH = os.path.join(os.getcwd(), "../../../app.db")
+print(f"📁 db_helper: Подключаюсь к базе по пути: {DB_PATH}")
+print(f"📁 db_helper: Файл существует: {os.path.exists(DB_PATH)}")
+
+DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
+print(f"📁 db_helper: DATABASE_URL = {DATABASE_URL}")
+
+
 class DBHelper:
     def __init__(
         self,
@@ -29,17 +39,7 @@ class DBHelper:
             echo_pool=echo_pool,
             pool_size=pool_size,
             max_overflow=max_overflow,
-            pool_pre_ping=True,
-            pool_recycle=3600,
         )
-
-        connect_args = {
-            "timeout": 30,
-            "command_timeout": 60,
-            "server_settings": {
-                "application_name": "cms_app",
-            },
-        }
 
         self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
             bind=self.engine,
@@ -50,16 +50,6 @@ class DBHelper:
 
     async def dispose(self) -> None:
         await self.engine.dispose()
-
-    async def check_connection(self) -> bool:
-        """Проверка соединения с базой данных"""
-        try:
-            async with self.engine.connect() as conn:
-                await conn.execute("SELECT 1")
-            return True
-        except Exception as e:
-            log.error(f"Database connection check failed: {e}")
-            return False
 
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
