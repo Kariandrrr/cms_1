@@ -1,9 +1,9 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import asyncio
 
 from .api import api_router
 from .core.config import settings
@@ -29,7 +29,13 @@ app = FastAPI(
 
 app.include_router(api_router, prefix=settings.api.prefix)
 
-origins = ["http://localhost:3000"]
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "*",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
