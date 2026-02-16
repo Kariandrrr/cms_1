@@ -1,17 +1,16 @@
 from __future__ import annotations
 
+from enum import Enum as PyEnum
 from typing import List, TYPE_CHECKING
 
 from sqlalchemy import String, Enum, LargeBinary
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
-from enum import Enum as PyEnum
-from . import Post
+from sqlalchemy.orm import validates
+
 from .base import Base
 from .mixins.created_at import CreatedAtMixin
 from .mixins.int_id_pk import IntIdPkMixin
-from sqlalchemy.orm import validates
-
 
 if TYPE_CHECKING:
     from . import Post
