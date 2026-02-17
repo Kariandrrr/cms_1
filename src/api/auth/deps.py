@@ -36,19 +36,28 @@ async def get_current_user(
     return user
 
 
-def admin_only(current_user: User = Depends(get_current_user)):
+def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+    return current_user
+
+
+def admin_only(current_user: User = Depends(get_current_user)) -> User:
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(
+            status_code=403, detail="Not enough permissions. Only for admin"
+        )
     return current_user
 
 
 def editor_or_admin(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(
+            status_code=403, detail="Not enough permissions. Only for admin"
+        )
     return current_user
 
 
-def user_only(current_user: User = Depends(get_current_user)):
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    return current_user
+#
+# def user_only(current_user: User = Depends(get_current_user)):
+#     if not current_user:
+#         raise HTTPException(status_code=401, detail="Authentication required")
+#     return current_user
