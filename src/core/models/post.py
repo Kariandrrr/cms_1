@@ -26,17 +26,16 @@ class Post(Base, IntIdPkMixin, CreatedAtMixin):
         server_default=func.now(), onupdate=func.now()
     )
 
-
-# RELATIONSHIP
-author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-author: Mapped["User"] = relationship(back_populates="posts")
-categories: Mapped[List["Category"]] = relationship(
-    secondary="post_category",
-    back_populates="posts",
-    passive_deletes=True,
-)
-tags: Mapped[List["Tag"]] = relationship(
-    secondary="post_tag",
-    back_populates="posts",
-    passive_deletes=True,
-)
+    # RELATIONSHIP
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    author: Mapped["User"] = relationship(back_populates="posts")
+    categories: Mapped[List["Category"]] = relationship(
+        secondary="post_category",
+        back_populates="posts",
+        passive_deletes=True,
+    )
+    tags: Mapped[List["Tag"]] = relationship(
+        secondary="post_tag",
+        back_populates="posts",
+        passive_deletes=True,
+    )

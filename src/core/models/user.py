@@ -42,5 +42,4 @@ class User(Base, IntIdPkMixin, CreatedAtMixin):
                 return UserRole.EDITOR
         return value
 
-
-posts: Mapped[List["Post"]] = relationship(back_populates="author")
+    posts: Mapped[List["Post"]] = relationship(back_populates="author")
