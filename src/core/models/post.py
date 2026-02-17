@@ -16,25 +16,27 @@ if TYPE_CHECKING:
 
 
 class Post(Base, IntIdPkMixin, CreatedAtMixin):
-    title: Mapped[str] = mapped_column(String(200))
+    title: Mapped[str] = mapped_column(String(200), index=True)
     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     content: Mapped[str] = mapped_column(Text)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(String(20), default="draft")
-    published_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="draft", index=True)
+    published_at: Mapped[datetime | None] = mapped_column(nullable=True, index=True)
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
     )
 
 
 # RELATIONSHIP
-author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 author: Mapped["User"] = relationship(back_populates="posts")
 categories: Mapped[List["Category"]] = relationship(
     secondary="post_category",
     back_populates="posts",
+    passive_deletes=True,
 )
 tags: Mapped[List["Tag"]] = relationship(
     secondary="post_tag",
     back_populates="posts",
+    passive_deletes=True,
 )
