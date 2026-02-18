@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import api_router
+from .routers import posts_router
 from .core.config import settings
 from .core.models import db_helper
 
@@ -28,6 +29,7 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.api.prefix)
+app.include_router(posts_router)
 
 origins = [
     "http://localhost:5173",
