@@ -52,5 +52,3 @@ def editor_or_admin(current_user: User = Depends(get_current_user)):
             status_code=403, detail="Not enough permissions. Only for admin"
         )
     return current_user
-
-
