@@ -2,14 +2,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...core.schemas.user import UserInDB
-from ...crud.user import get_user_by_username
 from .utils_jwt import decode_jwt
 from ...core.models.db_helper import get_db
 from ...core.models.user import User
+from ...crud.user import get_user_by_username
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 async def get_current_user(
@@ -56,8 +54,3 @@ def editor_or_admin(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-#
-# def user_only(current_user: User = Depends(get_current_user)):
-#     if not current_user:
-#         raise HTTPException(status_code=401, detail="Authentication required")
-#     return current_user
