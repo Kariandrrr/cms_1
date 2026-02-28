@@ -48,8 +48,3 @@ async def login(
 
     token = encode_jwt(payload)
     return Token(access_token=token)
-
-
-@router.get("/test-db")
-async def test_db(db: AsyncSession = Depends(get_db)):
-    return {"message": "Database session injected successfully"}
