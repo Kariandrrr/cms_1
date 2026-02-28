@@ -1,7 +1,8 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..crud.post_filter import get_posts_with_filters, get_posts_archive
 from ..api.auth.deps import get_current_user
 from ..core.models.db_helper import get_db
 from ..core.models.user import User
@@ -19,7 +20,7 @@ from ..crud.post import (
     delete_post,
     get_post_by_slug,
 )
-from datetime import datetime
+from ..crud.post_filter import get_posts_with_filters, get_posts_archive
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -29,27 +30,6 @@ def calculate_pages(total: int, limit: int) -> int:
 
 
 @router.get("/", response_model=list[PostOut])
-# async def list_posts(
-#     search: str | None = Query(
-#         None, description="Поиск по заголовку/содержимому/анонсу"
-#     ),
-#     status: str | None = Query(None, description="draft / published"),
-#     limit: int = Query(20, ge=1, le=100),
-#     offset: int = Query(0, ge=0),
-#     db: AsyncSession = Depends(get_db),
-#     current_user: User | None = Depends(get_current_active_user),
-# ):
-#     is_admin_or_editor = current_user and current_user.role in ("ADMIN", "EDITOR")
-#
-#     posts = await get_posts(
-#         db,
-#         search=search,
-#         status=status,
-#         limit=limit,
-#         offset=offset,
-#         for_admin=is_admin_or_editor,
-#     )
-#     return posts
 async def list_posts(
     filters: PostFilterParams = Depends(),
     db: AsyncSession = Depends(get_db),
@@ -150,10 +130,19 @@ async def publish_post(
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
+    if post.author_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="You can only publish your own posts"
+        )
+
+    if post.status == "published":
+        raise HTTPException(status_code=403, detail="Post already published")
+
     post.status = "published"
     if post.published_at is None:
         post.published_at = datetime.now()
 
+    post.updated_at = datetime.now()
     await db.commit()
     await db.refresh(post)
     return post

@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import api_router
-from .routers import posts_router
 from .core.config import settings
 from .core.models import db_helper
+from .routers import posts_router
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 

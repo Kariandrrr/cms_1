@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from sqlalchemy import select, or_, and_, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.models.post import Post
-from ..core.models.user import User
 from ..core.schemas.post import PostFilterParams
 
 
@@ -76,7 +75,7 @@ async def get_published_posts(
     sort_order: str = "desc",
     limit: int = 10,
     offset: int = 0,
-) -> List[Post]:
+) -> list[Post]:
     stmt = select(Post).where(Post.status == "published")
 
     if search:
@@ -118,7 +117,7 @@ async def get_author_posts(
     sort_order: str = "desc",
     limit: int = 10,
     offset: int = 0,
-) -> List[Post]:
+) -> list[Post]:
     stmt = select(Post).where(Post.author_id == author_id)
 
     if search:
@@ -226,7 +225,7 @@ async def get_posts_archive(
     year: Optional[int] = None,
     month: Optional[int] = None,
     author_id: Optional[int] = None,
-) -> List[Post]:
+) -> list[Post]:
 
     stmt = select(Post).where(Post.status == "published")
 
