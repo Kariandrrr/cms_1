@@ -50,3 +50,64 @@ class PostOut(PostBase):
 
 class PostPublic(PostOut):
     author_username: str | None = None
+
+
+# FOR FILTRATION
+class PostFilterParams(BaseModel):
+    search: str | None = Field(default=None, description="Поиск по заголовку и содержимому")
+
+    # columns
+    status: str | None = Field(
+        default=None, pattern="^(draft|published)$", description="Фильтр по статусу"
+    )
+    author_id: int | None = Field(default=None, description="Фильтр по ID автора")
+
+    # dates
+    published_at: datetime | None = Field(
+        default=None, description="Начальная дата публикации (включительно)"
+    )
+    created_at: datetime | None = Field(
+        default=None, description="Начальная дата создания (включительно)"
+    )
+
+    # pagination
+    skip: int = Field(default=0, ge=0, description="Количество пропускаемых записей")
+    limit: int = Field(
+        default=10, ge=1, le=100, description="Максимальное количество записей"
+    )
+
+    sort_by: str = Field(
+        default="created_at",
+        pattern="^(created_at|updated_at|published_at|title|status)$",
+        description="Поле для сортировки",
+    )
+    sort_order: str = Field(
+        default="desc", pattern="^(asc|desc)$", description="Направление сортировки"
+    )
+
+    class Config:
+        extra = "forbid"
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat(),
+        }
+
+
+class PostListResponse(BaseModel):
+    items: list[PostOut | PostPublic]
+    total: int
+    skip: int
+    limit: int
+    filters_applied: dict
+
+    class Config:
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat(),
+        }
+
+
+class PostPage(BaseModel):
+    items: list[PostOut]
+    total: int
+    page: int
+    pages: int
+    limit: int
