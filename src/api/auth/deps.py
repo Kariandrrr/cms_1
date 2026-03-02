@@ -52,3 +52,12 @@ def editor_or_admin(current_user: User = Depends(get_current_user)):
             status_code=403, detail="Not enough permissions. Only for admin"
         )
     return current_user
+
+
+async def check_if_admin(current_user: User = Depends(get_current_active_user)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Только администраторы имеют доступ к этому ресурсу",
+        )
+    return current_user
