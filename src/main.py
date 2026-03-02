@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api import api_router
 from .core.config import settings
 from .core.models import db_helper
-from .routers import posts_router
+from .routers import posts_router, stats_router
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -30,6 +30,7 @@ app = FastAPI(
 
 app.include_router(api_router, prefix=settings.api.prefix)
 app.include_router(posts_router)
+app.include_router(stats_router)
 
 origins = [
     "http://localhost:5173",
