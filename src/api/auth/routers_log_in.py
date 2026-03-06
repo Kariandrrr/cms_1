@@ -6,6 +6,7 @@ from .utils_jwt import encode_jwt, validate_password
 from ...core.models.db_helper import get_db
 from ...core.schemas.user import UserOut, UserCreate, Token
 from ...crud.user import get_user_by_username, create_user
+from .deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -46,3 +47,14 @@ async def login(
 
     token = encode_jwt(payload)
     return Token(access_token=token)
+
+
+@router.get("/me", response_model=UserOut)
+async def read_current_user(
+    current_user=Depends(get_current_user),
+):
+    return UserOut(
+        id=current_user.id,
+        username=current_user.username,
+        role=current_user.role.value.lower(),
+    )
