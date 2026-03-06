@@ -29,7 +29,7 @@ def calculate_pages(total: int, limit: int) -> int:
     return (total + limit - 1) // limit if total > 0 else 0
 
 
-@router.get("/", response_model=list[PostOut])
+@router.get("/", response_model=PostPage)
 async def list_posts(
     filters: PostFilterParams = Depends(),
     db: AsyncSession = Depends(get_db),
