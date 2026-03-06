@@ -28,10 +28,6 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-app.include_router(api_router, prefix=settings.api.prefix)
-app.include_router(posts_router)
-app.include_router(stats_router)
-
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -46,6 +42,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(api_router, prefix=settings.api.prefix)
+app.include_router(posts_router)
+app.include_router(stats_router)
 
 
 if __name__ == "__main__":
