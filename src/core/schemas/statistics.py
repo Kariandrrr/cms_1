@@ -29,4 +29,4 @@ class UserPersonalStatistics(BaseModel):
     my_published_posts: int
     my_draft_posts: int
     my_last_post_date: datetime | None
-    first_post_date: datetime | None
+    my_first_post_date: datetime | None

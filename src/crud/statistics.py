@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from sqlalchemy import func, and_
-from sqlalchemy import select
+from sqlalchemy import select, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.models.post import Post
@@ -17,16 +17,12 @@ async def get_admin_stat(db: AsyncSession) -> dict:
     users_stats = await db.execute(
         select(
             func.count(User.id).label("total_users"),
-            func.sum(func.case((User.is_active == True, 1), else_=0)).label(
-                "active_users"
-            ),
-            func.sum(func.case((User.created_at >= today_start, 1), else_=0)).label(
+            func.sum(case((User.is_active, 1), else_=0)).label("active_users"),
+            func.sum(case((User.created_at >= today_start, 1), else_=0)).label(
                 "new_today"
             ),
-            func.sum(func.case((User.created_at >= week_ago, 1), else_=0)).label(
-                "new_week"
-            ),
-            func.sum(func.case((User.created_at >= month_ago, 1), else_=0)).label(
+            func.sum(case((User.created_at >= week_ago, 1), else_=0)).label("new_week"),
+            func.sum(case((User.created_at >= month_ago, 1), else_=0)).label(
                 "new_month"
             ),
         )
@@ -35,18 +31,10 @@ async def get_admin_stat(db: AsyncSession) -> dict:
 
     posts_stats = await db.execute(
         select(
-            select(
-                func.count(Post.id).label("total_posts"),
-                func.sum(func.case((Post.status == "published", 1), else_=0)).label(
-                    "published"
-                ),
-                func.sum(func.case((Post.status == "draft", 1), else_=0)).label(
-                    "draft"
-                ),
-                func.sum(func.case((Post.status == "archived", 1), else_=0)).label(
-                    "archived"
-                ),
-            ).where(Post.status != "deleted")
+            func.count(Post.id).label("total_posts"),
+            func.sum(case((Post.status == "published", 1), else_=0)).label("published"),
+            func.sum(case((Post.status == "draft", 1), else_=0)).label("draft"),
+            func.sum(case((Post.status == "archived", 1), else_=0)).label("archived"),
         )
     )
     posts_data = posts_stats.first()
@@ -67,8 +55,7 @@ async def get_admin_stat(db: AsyncSession) -> dict:
             "total_posts": posts_data.total_posts or 0,
             "published_posts": posts_data.published or 0,
             "draft_posts": posts_data.draft or 0,
-            "archived_posts": posts_data.archived or 0,
-            "total_views": posts_data.total_views or 0,
+            "achieved_posts": posts_data.archived or 0,
             "average_posts_per_user": round(avg_posts, 2),
         },
         "last_updated": now,
@@ -79,10 +66,8 @@ async def get_user_stats(db: AsyncSession, user_id: int) -> dict:
     user_posts_stats = await db.execute(
         select(
             func.count(Post.id).label("total_posts"),
-            func.sum(func.case((Post.status == "published", 1), else_=0)).label(
-                "published"
-            ),
-            func.sum(func.case((Post.status == "draft", 1), else_=0)).label("draft"),
+            func.sum(case((Post.status == "published", 1), else_=0)).label("published"),
+            func.sum(case((Post.status == "draft", 1), else_=0)).label("draft"),
             func.max(Post.created_at).label("last_post_date"),
             func.min(Post.created_at).label("first_post_date"),
         ).where(and_(Post.author_id == user_id, Post.status != "deleted"))
@@ -92,7 +77,6 @@ async def get_user_stats(db: AsyncSession, user_id: int) -> dict:
         "my_total_posts": posts_data.total_posts or 0,
         "my_published_posts": posts_data.published or 0,
         "my_draft_posts": posts_data.draft or 0,
-        "my_total_views": posts_data.total_views or 0,
         "my_last_post_date": posts_data.last_post_date,
         "my_first_post_date": posts_data.first_post_date,
     }
