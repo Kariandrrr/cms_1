@@ -227,22 +227,22 @@ async def get_posts_archive(
     author_id: Optional[int] = None,
 ) -> list[Post]:
 
-    stmt = select(Post).where(Post.status == "published")
+    stmt = select(Post).where(Post.status == "archived")
 
     if year:
         stmt = stmt.where(
             and_(
-                func.extract("year", Post.published_at) == year,
+                func.extract("year", Post.created_at) == year,
             )
         )
 
         if month:
-            stmt = stmt.where(func.extract("month", Post.published_at) == month)
+            stmt = stmt.where(func.extract("month", Post.created_at) == month)
 
     if author_id:
         stmt = stmt.where(Post.author_id == author_id)
 
-    stmt = stmt.order_by(desc(Post.published_at))
+    stmt = stmt.order_by(desc(Post.updated_at))
 
     result = await db.execute(stmt)
     return result.scalars().all()
