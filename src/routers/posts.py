@@ -97,6 +97,44 @@ async def get_archive(
     return posts
 
 
+@router.put("/{post_id}/restore", response_model=PostOut)
+async def restore_post_from_archive(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    post = await get_post_by_id(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    if current_user.role.value != "ADMIN" or post.author_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can't edit this post")
+
+    post.status = "published"
+    await db.commit()
+    await db.refresh(post)
+    return post
+
+
+@router.put("/{post_id}/archive", response_model=PostOut)
+async def put_post_to_archive(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    post = await get_post_by_id(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    if current_user.role.value != "ADMIN" or post.author_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can't edit this post")
+
+    post.status = "archived"
+    await db.commit()
+    await db.refresh(post)
+    return post
+
+
 @router.get("/{post_id}", response_model=PostOut)
 @router.get("/{post_id}", response_model=PostOut)
 async def get_post(
