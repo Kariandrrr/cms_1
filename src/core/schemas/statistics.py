@@ -14,7 +14,7 @@ class PostStatistics(BaseModel):
     total_posts: int
     published_posts: int
     draft_posts: int
-    achieved_posts: int
+    archived_posts: int
     average_posts_per_user: float
 
 

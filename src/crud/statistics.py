@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..core.models.post import Post
 from ..core.models.user import User
 
-
 RUSSIAN_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 
 
@@ -56,6 +55,7 @@ async def get_admin_stat(db: AsyncSession) -> dict:
         day_stats = select(
             func.sum(case((Post.status == "published", 1), else_=0)).label("published"),
             func.sum(case((Post.status == "draft", 1), else_=0)).label("drafts"),
+            func.sum(case((Post.status == "archived", 1), else_=0)).label("archived"),
         ).where(
             Post.created_at >= day_start,
             Post.created_at <= day_end,
@@ -84,7 +84,7 @@ async def get_admin_stat(db: AsyncSession) -> dict:
             "total_posts": posts_data.total_posts or 0,
             "published_posts": posts_data.published or 0,
             "draft_posts": posts_data.draft or 0,
-            "achieved_posts": posts_data.archived or 0,
+            "archived_posts": posts_data.archived or 0,
             "average_posts_per_user": round(avg_posts, 2),
         },
         "posts_by_day": posts_by_day,
