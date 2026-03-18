@@ -13,7 +13,7 @@ class PostBase(BaseModel):
     summary: str | None = Field(None, max_length=500, description="Краткое описание")
     status: str = Field(
         default="draft",
-        pattern="^(draft|published)$",
+        pattern="^(draft|published|archived)$",
         description="Статус: draft или published",
     )
 
@@ -26,7 +26,7 @@ class PostUpdate(BaseModel):
     title: str | None = Field(None, min_length=3, max_length=200)
     content: str | None = Field(None, min_length=10)
     summary: str | None = Field(None, max_length=500)
-    status: str | None = Field(None, pattern="^(draft|published)$")
+    status: str | None = Field(None, pattern="^(draft|published|archived)$")
 
     class Config:
         extra = "forbid"
@@ -54,11 +54,15 @@ class PostPublic(PostOut):
 
 # FOR FILTRATION
 class PostFilterParams(BaseModel):
-    search: str | None = Field(default=None, description="Поиск по заголовку и содержимому")
+    search: str | None = Field(
+        default=None, description="Поиск по заголовку и содержимому"
+    )
 
     # columns
     status: str | None = Field(
-        default=None, pattern="^(draft|published)$", description="Фильтр по статусу"
+        default=None,
+        pattern="^(draft|published|archived)$",
+        description="Фильтр по статусу",
     )
     author_id: int | None = Field(default=None, description="Фильтр по ID автора")
 
