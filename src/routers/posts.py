@@ -2,10 +2,12 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, or_
 
 from ..api.auth.deps import get_current_user
 from ..core.models.db_helper import get_db
 from ..core.models.user import User
+from ..core.models.post import Post
 from ..core.schemas.post import (
     PostCreate,
     PostUpdate,
@@ -87,14 +89,36 @@ async def get_my_posts(
     )
 
 
-@router.get("/archive", response_model=list[PostOut])
+@router.get("/archive")
 async def get_archive(
-    year: int | None = Query(None, ge=2000, le=2100),
-    month: int | None = Query(None, ge=1, le=12),
+    search: str | None = None,
+    skip: int = 0,
+    limit: int = 10,
     db: AsyncSession = Depends(get_db),
 ):
-    posts = await get_posts_archive(db, year=year, month=month)
-    return posts
+    stmt = select(Post).where(Post.status == "archived")
+    count_stmt = select(func.count(Post.id)).where(Post.status == "archived")
+
+    if search:
+        search_filter = or_(
+            Post.title.ilike(f"%{search}%"),
+            Post.content.ilike(f"%{search}%"),
+        )
+        stmt = stmt.where(search_filter)
+        count_stmt = count_stmt.where(search_filter)
+
+    total_result = await db.execute(count_stmt)
+    total = total_result.scalar_one()
+
+    stmt = stmt.order_by(Post.created_at.desc()).offset(skip).limit(limit)
+
+    result = await db.execute(stmt)
+    posts = result.scalars().all()
+
+    return {
+        "items": posts,
+        "total": total,
+    }
 
 
 @router.put("/{post_id}/restore", response_model=PostOut)
@@ -135,8 +159,7 @@ async def put_post_to_archive(
     return post
 
 
-@router.get("/{post_id}", response_model=PostOut)
-@router.get("/{post_id}", response_model=PostOut)
+@router.get("/{post_id}")
 async def get_post(
     post_id: int,
     db: AsyncSession = Depends(get_db),
