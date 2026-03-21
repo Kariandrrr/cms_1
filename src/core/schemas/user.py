@@ -32,3 +32,10 @@ class UserInDB(BaseModel):
     is_active: bool = True
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdate(BaseModel):
+    username: str | None
+    password: str | None
+    role: str | None
+    is_active: bool | None = None
